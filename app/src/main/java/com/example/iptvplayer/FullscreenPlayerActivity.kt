@@ -12,7 +12,7 @@ class FullscreenPlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) // Tam ekran PlayerView tasarımı
+        setContentView(R.layout.activity_fullscreen_player)
 
         val streamUrl = intent.getStringExtra("STREAM_URL") ?: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
         val playerView = findViewById<PlayerView>(R.id.playerView)
