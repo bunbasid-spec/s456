@@ -3,7 +3,6 @@ package com.example.iptvplayer
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
@@ -14,7 +13,6 @@ class LiveTvActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
     private lateinit var miniPlayerView: PlayerView
     private var currentlyPlayingUrl: String = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-    private var selectedChannelUrl: String = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +25,9 @@ class LiveTvActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        findViewById<TextView>(R.id.navHome).setOnClickListener {
-            finish() // Ana ekrana döner
+        val navHome = findViewById<TextView>(R.id.navHome)
+        navHome.setOnClickListener {
+            finish()
         }
     }
 
@@ -42,16 +41,13 @@ class LiveTvActivity : AppCompatActivity() {
         }
     }
 
-    // Kumandada OK tuşuna basıldığında çağrılan mantık
     fun onChannelClick(clickedChannelUrl: String) {
         if (currentlyPlayingUrl == clickedChannelUrl) {
-            // Eğer aynı kanala tekrar OK basıldıysa TAM EKRAN yap
             val intent = Intent(this, FullscreenPlayerActivity::class.java).apply {
                 putExtra("STREAM_URL", clickedChannelUrl)
             }
             startActivity(intent)
         } else {
-            // İlk tıklamada sağdaki küçük oynatıcıda çalıştır
             currentlyPlayingUrl = clickedChannelUrl
             player?.setMediaItem(MediaItem.fromUri(currentlyPlayingUrl))
             player?.prepare()
