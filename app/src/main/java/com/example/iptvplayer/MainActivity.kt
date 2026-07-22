@@ -1,5 +1,6 @@
 package com.example.iptvplayer
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -9,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var updateManager: UpdateManager
-    private val currentVersion = "1.0.0" // Uygulamanın güncel versiyonu
+    private val currentVersion = "1.0.0"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,11 +18,9 @@ class MainActivity : AppCompatActivity() {
 
         updateManager = UpdateManager(this)
 
-        // Versiyon Bilgisini Sağ Alt Köşeye Yazdır
         val tvVersion = findViewById<TextView>(R.id.tvVersion)
         tvVersion.text = "v$currentVersion"
 
-        // Buton Tanımlamaları
         val btnLiveTv = findViewById<Button>(R.id.btnLiveTv)
         val btnMovies = findViewById<Button>(R.id.btnMovies)
         val btnSeries = findViewById<Button>(R.id.btnSeries)
@@ -30,7 +29,11 @@ class MainActivity : AppCompatActivity() {
         val btnSettings = findViewById<Button>(R.id.btnSettings)
         val btnExit = findViewById<Button>(R.id.btnExit)
 
-        // Güncelleme Butonu Tıklaması
+        // Live Butonuna Basıldığında LiveTvActivity Sayfasına Git
+        btnLiveTv.setOnClickListener {
+            startActivity(Intent(this, LiveTvActivity::class.java))
+        }
+
         btnUpdate.setOnClickListener {
             Toast.makeText(this, "Güncellemeler kontrol ediliyor...", Toast.LENGTH_SHORT).show()
             updateManager.checkForUpdates(currentVersion) { apkUrl ->
@@ -41,17 +44,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Çıkış Butonu
         btnExit.setOnClickListener {
-            finishAffinity() // Uygulamayı tamamen kapatır
+            finishAffinity()
         }
 
-        // Şimdilik boş olan buton bildirimleri
-        btnLiveTv.setOnClickListener { showToast("Canlı TV modülü hazırlanıyor") }
-        btnMovies.setOnClickListener { showToast("Filmler modülü hazırlanıyor") }
-        btnSeries.setOnClickListener { showToast("Diziler modülü hazırlanıyor") }
-        btnAccount.setOnClickListener { showToast("Hesap ayarları hazırlanıyor") }
-        btnSettings.setOnClickListener { showToast("Ayarlar hazırlanıyor") }
+        btnMovies.setOnClickListener { showToast("Movies modülü hazırlanıyor") }
+        btnSeries.setOnClickListener { showToast("Series modülü hazırlanıyor") }
+        btnAccount.setOnClickListener { showToast("Account ayarları hazırlanıyor") }
+        btnSettings.setOnClickListener { showToast("Settings hazırlanıyor") }
     }
 
     private fun showToast(message: String) {
