@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 
 class MainActivity : AppCompatActivity() {
@@ -24,17 +25,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializePlayer() {
-        // HIZLI KANAL GEÇİŞİ İÇİN OPTİMİZE EDİLMİŞ BUFFER AYARLARI
+        // En yüksek video kalitesini zorlayan Track Selector
+        val trackSelector = DefaultTrackSelector(this).apply {
+            setParameters(
+                buildUponParameters()
+                    .setForceHighestSupportedBitrate(true) // Her zaman desteklenen en yüksek kaliteyi seç
+            )
+        }
+
+        // Hızlı açılış için optimize edilmiş buffer ayarları
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                1000,  // Min buffer (1 sn)
-                5000,  // Max buffer (5 sn)
-                500,   // Oynatmaya başlamak için gereken buffer (0.5 sn)
-                1000   // Re-buffer sonrası gereken süre (1 sn)
+                1500,  // Min buffer (1.5 sn)
+                8000,  // Max buffer (8 sn)
+                1000,  // Oynatmaya başlamak için gereken buffer (1 sn)
+                1500   // Re-buffer sonrası gereken süre (1.5 sn)
             )
             .build()
 
         player = ExoPlayer.Builder(this)
+            .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
             .build()
             .apply {
