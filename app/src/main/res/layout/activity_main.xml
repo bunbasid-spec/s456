@@ -1,14 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#121212"
+    android:padding="32dp">
 
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/playerView"
+    <!-- Başlık -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IPTV Player"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Ana Menü Izgarası (Grid Layout) -->
+    <GridLayout
+        android:id="@+id/menuGrid"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:use_controller="false" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
+        android:columnCount="4"
+        android:rowCount="2"
+        android:alignmentMode="alignMargins">
 
-</FrameLayout>
+        <Button
+            android:id="@+id/btnLiveTv"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="📺 Canlı TV"
+            android:focusable="true"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btnMovies"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="🎬 Filmler"
+            android:focusable="true"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btnSeries"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="🎞️ Diziler"
+            android:focusable="true"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btnAccount"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="👤 Hesap"
+            android:focusable="true"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btnUpdate"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="🔄 Güncelleme"
+            android:focusable="true"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btnSettings"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="⚙️ Ayarlar"
+            android:focusable="true"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btnExit"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:text="❌ Çıkış"
+            android:focusable="true"
+            android:clickable="true"/>
+
+    </GridLayout>
+
+    <!-- Sağ Alt Köşedeki Versiyon Yazısı -->
+    <TextView
+        android:id="@+id/tvVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="v1.0.0"
+        android:textColor="#888888"
+        android:textSize="14sp"/>
+
+</RelativeLayout>
