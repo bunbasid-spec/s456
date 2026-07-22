@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Sürüm Numarası (Örn: v1.0.3)'
+        description: 'Surum Numarasi (Orn: v1.0.3)'
         required: true
         default: 'v1.0.3'
 
@@ -28,16 +28,12 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
-      <!-- Otomatik Versiyon Güncelleme Adımı -->
+      # Otomatik Versiyon Guncelleme Adimi
       - name: Update Version in build.gradle.kts
         run: |
           RAW_VERSION="${{ github.event.inputs.version_name }}"
-          CLEAN_VERSION=$(echo $RAW_VERSION | sed 's/[vV]//g')
-          
-          # versionName ve versionCode otomatik güncelleniyor
+          CLEAN_VERSION=$(echo "$RAW_VERSION" | sed 's/[vV]//g')
           sed -i "s/versionName = \".*\"/versionName = \"$CLEAN_VERSION\"/g" app/build.gradle.kts
-          
-          # Otomatik dinamik versionCode üretimi (Örn: timestamp)
           NEW_CODE=$(date +%s)
           sed -i "s/versionCode = .*/versionCode = $NEW_CODE/g" app/build.gradle.kts
 
@@ -49,7 +45,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version_name }}
           name: Release ${{ github.event.inputs.version_name }}
-          body: "Otomatik derlenen yeni sürüm (${{ github.event.inputs.version_name }})."
+          body: "Otomatik derlenen yeni surum (${{ github.event.inputs.version_name }})."
           draft: false
           prerelease: false
           files: app/build/outputs/apk/debug/app-debug.apk
