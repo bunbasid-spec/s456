@@ -18,8 +18,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+    # Gradlew dosyasına çalıştırma (execute) izni veriyoruz
+    - name: Make gradlew executable
+      run: chmod +x gradlew
 
     - name: Build APK
       run: ./gradlew assembleDebug --stacktrace
