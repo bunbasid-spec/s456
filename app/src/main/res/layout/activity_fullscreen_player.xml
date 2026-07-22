@@ -32,7 +32,7 @@
                 android:id="@+id/imgChannelLogo"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@android:drawable/ic_menu_tv"
+                android:src="@android:drawable/ic_media_play"
                 android:background="#333333"
                 android:padding="4dp"
                 android:layout_marginEnd="16dp"/>
