@@ -10,11 +10,18 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var updateManager: UpdateManager
-    private val currentVersion = "1.0.0"
+    private lateinit var currentVersion: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Versiyon numarasını Android sisteminden dinamik alıyoruz (Örn: 1.0.1)
+        currentVersion = try {
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "1.0.1"
+        } catch (e: Exception) {
+            "1.0.1"
+        }
 
         updateManager = UpdateManager(this)
 
@@ -29,7 +36,6 @@ class MainActivity : AppCompatActivity() {
         val btnSettings = findViewById<Button>(R.id.btnSettings)
         val btnExit = findViewById<Button>(R.id.btnExit)
 
-        // Live Butonuna Basıldığında LiveTvActivity Sayfasına Git
         btnLiveTv.setOnClickListener {
             startActivity(Intent(this, LiveTvActivity::class.java))
         }
