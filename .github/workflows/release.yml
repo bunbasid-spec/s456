@@ -25,6 +25,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Gradle 8.5 Sürümünü Sabitliyoruz
+      - name: Setup Gradle 8.5
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
@@ -38,7 +44,7 @@ jobs:
           sed -i "s/versionCode = .*/versionCode = $NEW_CODE/g" app/build.gradle.kts
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
