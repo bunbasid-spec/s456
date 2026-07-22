@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- APK İndirmek ve Yüklemek İçin Gereken İzinler -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
@@ -22,7 +21,12 @@
             </intent-filter>
         </activity>
 
-        <!-- İndirilen APK'yı Yükleyiciye Sunan FileProvider -->
+        <!-- Live Ekranı -->
+        <activity android:name=".LiveTvActivity" />
+
+        <!-- Tam Ekran Oynatıcı -->
+        <activity android:name=".FullscreenPlayerActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
