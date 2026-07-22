@@ -1,13 +1,19 @@
-name: Build and Create Release
+name: Manual Build and Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Sürüm Numarası (Örn: v1.0.3)'
+        required: true
+        default: 'v1.0.3'
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Code
@@ -22,19 +28,28 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
+      <!-- Otomatik Versiyon Güncelleme Adımı -->
+      - name: Update Version in build.gradle.kts
+        run: |
+          RAW_VERSION="${{ github.event.inputs.version_name }}"
+          CLEAN_VERSION=$(echo $RAW_VERSION | sed 's/[vV]//g')
+          
+          # versionName ve versionCode otomatik güncelleniyor
+          sed -i "s/versionName = \".*\"/versionName = \"$CLEAN_VERSION\"/g" app/build.gradle.kts
+          
+          # Otomatik dinamik versionCode üretimi (Örn: timestamp)
+          NEW_CODE=$(date +%s)
+          sed -i "s/versionCode = .*/versionCode = $NEW_CODE/g" app/build.gradle.kts
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
-
-      - name: Get Tag Name
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          name: Release ${{ steps.get_version.outputs.VERSION }}
-          body: "Otomatik derlenen yeni sürüm (${{ steps.get_version.outputs.VERSION }})."
+          tag_name: ${{ github.event.inputs.version_name }}
+          name: Release ${{ github.event.inputs.version_name }}
+          body: "Otomatik derlenen yeni sürüm (${{ github.event.inputs.version_name }})."
           draft: false
           prerelease: false
           files: app/build/outputs/apk/debug/app-debug.apk
