@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build and Release Android APK
 
 on:
   push:
@@ -18,20 +18,20 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # Eksik Gradle Wrapper dosyalarını sıfırdan güvenle oluşturur
     - name: Setup Gradle Wrapper
       run: gradle wrapper --gradle-version 8.5
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # APK Derleme
     - name: Build Debug APK
       run: ./gradlew assembleDebug --stacktrace
 
-    # APK Dosyasını artifact olarak indirmeye sunar
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
+    # APK'yı GitHub Releases kısmında Otomatik Yayınlar
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        name: IPTVPlayer-debug.apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+        files: app/build/outputs/apk/debug/app-debug.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
