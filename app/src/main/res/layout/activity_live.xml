@@ -2,35 +2,308 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
-    android:orientation="horizontal">
+    android:background="#521e9a"
+    android:orientation="vertical">
 
-    <!-- Sol Sütun: Kategoriler -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCategories"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:paddingVertical="10dp"
-        android:clipToPadding="false"
-        android:focusable="true" />
+    <!-- 1. ÜST NAVİGASYON BARI -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:paddingHorizontal="24dp"
+        android:gravity="center_vertical"
+        android:background="#521e9a">
 
-    <!-- Orta Sütun: Kanallar -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChannels"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1.5"
-        android:paddingVertical="10dp"
-        android:clipToPadding="false"
-        android:focusable="true" />
+        <!-- Menü Seçenekleri -->
+        <LinearLayout
+            android:id="@+id/topMenuContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <!-- Sağ Sütun: Mini Video Penceresi -->
-    <FrameLayout
-        android:id="@+id/playerContainer"
-        android:layout_width="0dp"
+            <TextView
+                android:id="@+id/navHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:focusable="true"
+                android:clickable="true"
+                android:nextFocusRight="@id/navLive"
+                android:nextFocusDown="@id/etCategorySearch" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="|"
+                android:textColor="#88FFFFFF"
+                android:textSize="17sp"
+                android:layout_marginHorizontal="8dp"/>
+
+            <!-- Live Seçili (Sarı) -->
+            <TextView
+                android:id="@+id/navLive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Live"
+                android:textColor="#FFD700"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:focusable="true"
+                android:clickable="true"
+                android:nextFocusLeft="@id/navHome"
+                android:nextFocusRight="@id/navMovies"
+                android:nextFocusDown="@id/etCategorySearch" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="|"
+                android:textColor="#88FFFFFF"
+                android:textSize="17sp"
+                android:layout_marginHorizontal="8dp"/>
+
+            <TextView
+                android:id="@+id/navMovies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Movies"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:focusable="true"
+                android:clickable="true"
+                android:nextFocusLeft="@id/navLive"
+                android:nextFocusRight="@id/navSeries"
+                android:nextFocusDown="@id/rvChannels" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="|"
+                android:textColor="#88FFFFFF"
+                android:textSize="17sp"
+                android:layout_marginHorizontal="8dp"/>
+
+            <TextView
+                android:id="@+id/navSeries"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Series"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:focusable="true"
+                android:clickable="true"
+                android:nextFocusLeft="@id/navMovies"
+                android:nextFocusRight="@id/etGlobalSearch"
+                android:nextFocusDown="@id/rvChannels" />
+
+        </LinearLayout>
+
+        <!-- Üst Oval Arama Kutucuğu (Search) -->
+        <EditText
+            android:id="@+id/etGlobalSearch"
+            android:layout_width="260dp"
+            android:layout_height="36dp"
+            android:layout_toRightOf="@id/topMenuContainer"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="24dp"
+            android:background="@drawable/bg_search_input"
+            android:hint="🔍 Search"
+            android:paddingHorizontal="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#E2D0FB"
+            android:textSize="14sp"
+            android:focusable="true"
+            android:nextFocusLeft="@id/navSeries"
+            android:nextFocusDown="@id/rvChannels" />
+
+        <!-- En Sağa Yaslı 24h Saat -->
+        <TextClock
+            android:id="@+id/tvClock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:format12Hour="HH:mm"
+            android:format24Hour="HH:mm"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <!-- AYIRICI İNCE ÇİZGİ -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#33FFFFFF" />
+
+    <!-- 2. ANA İÇERİK ALANI -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="2.5"
-        android:background="#000000" />
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- SOL SÜTUN: KATEGORİLER -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:orientation="vertical">
+
+            <!-- Kategori Arama Kutusu -->
+            <EditText
+                android:id="@+id/etCategorySearch"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_search_input"
+                android:hint="🔍 Kategori Ara"
+                android:paddingHorizontal="12dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#E2D0FB"
+                android:textSize="13sp"
+                android:focusable="true"
+                android:nextFocusUp="@id/navHome"
+                android:nextFocusDown="@id/rvCategories"
+                android:nextFocusRight="@id/rvChannels" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCategories"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:focusable="true"
+                android:nextFocusUp="@id/etCategorySearch"
+                android:nextFocusRight="@id/rvChannels" />
+        </LinearLayout>
+
+        <!-- ORTA SÜTUN: KANALLAR -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3"
+            android:layout_marginEnd="6dp"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvChannels"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:focusable="true"
+                android:nextFocusUp="@id/etGlobalSearch"
+                android:nextFocusLeft="@id/rvCategories"
+                android:nextFocusRight="@id/playerContainer" />
+        </LinearLayout>
+
+        <!-- SAĞ SÜTUN: VİDEO VE AKSİYON BUTONLARI -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.1"
+            android:orientation="vertical">
+
+            <!-- Mini Video Ekranı -->
+            <FrameLayout
+                android:id="@+id/playerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="@drawable/selector_player_focus"
+                android:focusable="true"
+                android:clickable="true"
+                android:nextFocusUp="@id/etGlobalSearch"
+                android:nextFocusLeft="@id/rvChannels"
+                android:nextFocusDown="@id/btnCatchUp">
+
+                <TextView
+                    android:id="@+id/tvCurrentChannelName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="TR: FB TV HD Ⓗ"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Alt Butonlar (Orta Hizalanmış & Daha Geniş) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCatchUp"
+                    android:layout_width="120dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/selector_action_button"
+                    android:text="Catch Up"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:focusable="true"
+                    android:nextFocusUp="@id/playerContainer"
+                    android:nextFocusLeft="@id/rvChannels"
+                    android:nextFocusRight="@id/btnFavorite" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnFavorite"
+                    android:layout_width="140dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/selector_action_button"
+                    android:text="Add to Favorite"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:focusable="true"
+                    android:nextFocusUp="@id/playerContainer"
+                    android:nextFocusLeft="@id/btnCatchUp"
+                    android:nextFocusRight="@id/btnSearchAction" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSearchAction"
+                    android:layout_width="120dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/selector_action_button"
+                    android:text="Search"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:focusable="true"
+                    android:nextFocusUp="@id/playerContainer"
+                    android:nextFocusLeft="@id/btnFavorite" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

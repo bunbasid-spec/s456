@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Focus (Kumanda Üzerindeyken): #4a1790 (Çizgisiz) -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="6dp" />
+            <solid android:color="#4a1790" />
+        </shape>
+    </item>
+    <!-- Normal Hali: #7d4bbe -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="6dp" />
+            <solid android:color="#7d4bbe" />
+        </shape>
+    </item>
+</selector>

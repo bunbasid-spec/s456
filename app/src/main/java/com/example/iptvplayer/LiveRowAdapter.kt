@@ -1,5 +1,6 @@
 package com.example.iptvplayer
 
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,17 @@ class LiveRowAdapter(
 
         holder.itemView.setOnClickListener {
             onItemClick(title)
+        }
+
+        // Kumanda sınırlamaları
+        holder.itemView.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                // Sadece en alttaki elemandayken AŞAĞI basılırsa odağı listede tut
+                if (position == items.size - 1 && keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                    return@setOnKeyListener true
+                }
+            }
+            false
         }
     }
 

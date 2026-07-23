@@ -20,20 +20,17 @@ class FocusCenteredLinearLayoutManager(
         focusedChildVisible: Boolean
     ): Boolean {
         val parentHeight = height
-        val childCenter = child.top + (child.height / 2)
+        val childCenter = (child.top + child.bottom) / 2
         val targetCenter = parentHeight / 2
 
         val scrollAmount = childCenter - targetCenter
 
         if (scrollAmount != 0) {
-            if (immediate) {
-                parent.scrollBy(0, scrollAmount)
-            } else {
-                parent.smoothScrollBy(0, scrollAmount)
-            }
-            return true
+            // Anlık kaydırma yaparak odak ile liste hareketinin çakışmasını engelliyoruz
+            parent.scrollBy(0, scrollAmount)
         }
 
-        return super.requestChildRectangleOnScreen(parent, child, rect, immediate, focusedChildVisible)
+        // Android'in varsayılan kaydırma mekanizmasını ezip odağın işlendiğini bildiriyoruz
+        return true
     }
 }
