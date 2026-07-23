@@ -2,4 +2,6 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-cache-path name="my_sdk_temp" path="." />
     <cache-path name="cache" path="." />
+    <!-- Otomatik Güncelleme APK Yükleyicisi İçin Eklenen Yol -->
+    <external-files-path name="external_files" path="." />
 </paths>

@@ -1,39 +1,63 @@
 package com.example.iptvplayer
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 
 class UpdateManager(private val context: Context) {
 
-    // Kendi GitHub kullanıcı adını ve repo adını buraya yazabilirsin
-    private val githubApiUrl = "https://api.github.com/repos/bunbasid-spec/s456/releases/latest"
+    // GitHub Repo ve Kullanıcı Bilgilerin
+    private val githubUser = "bunbasid-spec"
+    private val repoName = "s456"
+    private val apiUrl = "https://api.github.com/repos/$githubUser/$repoName/releases/latest"
 
-    fun checkForUpdates(currentVersion: String, onUpdateAvailable: (apkUrl: String) -> Unit) {
+    fun checkForUpdates(silent: Boolean = false) {
         thread {
             try {
-                val url = URL(githubApiUrl)
+                val url = URL(apiUrl)
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("Accept", "application/vnd.github.v3+json")
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
 
                 if (connection.responseCode == 200) {
-                    val response = connection.inputStream.bufferedReader().readText()
+                    val response = connection.inputStream.bufferedReader().use { it.readText() }
                     val json = JSONObject(response)
-                    val latestVersion = json.getString("tag_name").replace("v", "")
 
-                    if (isNewerVersion(currentVersion, latestVersion)) {
-                        val assets = json.getJSONArray("assets")
-                        if (assets.length() > 0) {
-                            val downloadUrl = assets.getJSONObject(0).getString("browser_download_url")
-                            onUpdateAvailable(downloadUrl)
+                    val latestVersion = json.getString("tag_name").replace("v", "").trim()
+                    val currentVersion = context.packageManager
+                        .getPackageInfo(context.packageName, 0).versionName.trim()
+
+                    val assets = json.getJSONArray("assets")
+                    var downloadUrl = ""
+                    for (i in 0 until assets.length()) {
+                        val asset = assets.getJSONObject(i)
+                        if (asset.getString("name").endsWith(".apk")) {
+                            downloadUrl = asset.getString("browser_download_url")
+                            break
+                        }
+                    }
+
+                    if (isNewerVersion(currentVersion, latestVersion) && downloadUrl.isNotEmpty()) {
+                        (context as? androidx.appcompat.app.AppCompatActivity)?.runOnUiThread {
+                            showUpdateDialog(latestVersion, downloadUrl)
+                        }
+                    } else if (!silent) {
+                        (context as? androidx.appcompat.app.AppCompatActivity)?.runOnUiThread {
+                            Toast.makeText(context, "Uygulama güncel (v$currentVersion)", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -44,41 +68,92 @@ class UpdateManager(private val context: Context) {
     }
 
     private fun isNewerVersion(current: String, latest: String): Boolean {
-        // Basit versiyon karşılaştırması (Örn: 1.0.0 < 1.0.1)
-        return latest != current
+        val currentParts = current.split(".").mapNotNull { it.toIntOrNull() }
+        val latestParts = latest.split(".").mapNotNull { it.toIntOrNull() }
+
+        val length = maxOf(currentParts.size, latestParts.size)
+        for (i in 0 until length) {
+            val curr = currentParts.getOrElse(i) { 0 }
+            val lat = latestParts.getOrElse(i) { 0 }
+            if (lat > curr) return true
+            if (lat < curr) return false
+        }
+        return false
     }
 
-    fun downloadAndInstallApk(apkUrl: String) {
+    private fun showUpdateDialog(newVersion: String, downloadUrl: String) {
+        AlertDialog.Builder(context)
+            .setTitle("Yeni Güncelleme Mevcut!")
+            .setMessage("Yeni bir sürüm bulundu (v$newVersion). Şimdi güncellemek ister misiniz?")
+            .setPositiveButton("Güncelle") { _, _ ->
+                checkInstallPermissionAndDownload(downloadUrl)
+            }
+            .setNegativeButton("Daha Sonra", null)
+            .show()
+    }
+
+    private fun checkInstallPermissionAndDownload(downloadUrl: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!context.packageManager.canRequestPackageInstalls()) {
+                Toast.makeText(context, "Lütfen bilinmeyen kaynaklardan yüklemeye izin verin.", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                }
+                context.startActivity(intent)
+                return
+            }
+        }
+        downloadAndInstallApk(downloadUrl)
+    }
+
+    private fun downloadAndInstallApk(downloadUrl: String) {
+        Toast.makeText(context, "Güncelleme indiriliyor...", Toast.LENGTH_SHORT).show()
+
         thread {
             try {
-                val url = URL(apkUrl)
+                val url = URL(downloadUrl)
                 val connection = url.openConnection() as HttpURLConnection
                 connection.connect()
 
-                val file = File(context.externalCacheDir, "update.apk")
-                url.openStream().use { input ->
-                    file.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
+                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "update.apk")
+                if (file.exists()) file.delete()
+
+                val inputStream = connection.inputStream
+                val outputStream = FileOutputStream(file)
+
+                val buffer = ByteArray(4096)
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
                 }
 
-                installApk(file)
+                outputStream.close()
+                inputStream.close()
+
+                (context as? androidx.appcompat.app.AppCompatActivity)?.runOnUiThread {
+                    installApk(file)
+                }
+
             } catch (e: Exception) {
                 e.printStackTrace()
+                (context as? androidx.appcompat.app.AppCompatActivity)?.runOnUiThread {
+                    Toast.makeText(context, "İndirme başarısız oldu!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    private fun installApk(apkFile: File) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        val apkUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            FileProvider.getUriForFile(context, "${context.packageName}.provider", apkFile)
-        } else {
-            Uri.fromFile(apkFile)
-        }
+    private fun installApk(file: File) {
+        val apkUri: Uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file
+        )
 
-        intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(apkUri, "application/vnd.android.package-archive")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
         context.startActivity(intent)
     }
 }

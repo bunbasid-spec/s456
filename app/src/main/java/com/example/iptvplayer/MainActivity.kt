@@ -9,9 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var updateManager: UpdateManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Güncelleme Yöneticisini Başlat
+        updateManager = UpdateManager(this)
+
+        // Açılışta Arka Plan Güncelleme Kontrolü (Sessiz)
+        updateManager.checkForUpdates(silent = true)
 
         val tvVersion = findViewById<TextView>(R.id.tvVersion)
         try {
@@ -42,9 +50,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Hesap bilgileri hazırlanıyor...", Toast.LENGTH_SHORT).show()
         }
 
-        // Güncelleme Butonu
+        // Güncelleme Butonu (Manuel Kontrol)
         findViewById<Button>(R.id.btnUpdate)?.setOnClickListener {
             Toast.makeText(this, "Güncellemeler kontrol ediliyor...", Toast.LENGTH_SHORT).show()
+            updateManager.checkForUpdates(silent = false)
         }
 
         // Ayarlar Butonu
