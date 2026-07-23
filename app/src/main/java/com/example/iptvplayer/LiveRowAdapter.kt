@@ -1,36 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#121212"
-    android:orientation="horizontal">
+package com.example.iptvplayer
 
-    <!-- Sol Sütun: Kategoriler -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCategories"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:paddingVertical="10dp"
-        android:clipToPadding="false"
-        android:focusable="true" />
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 
-    <!-- Orta Sütun: Kanallar -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChannels"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1.5"
-        android:paddingVertical="10dp"
-        android:clipToPadding="false"
-        android:focusable="true" />
+class LiveRowAdapter(
+    private val items: List<String>,
+    private val onItemClick: (String) -> Unit
+) : RecyclerView.Adapter<LiveRowAdapter.ViewHolder>() {
 
-    <!-- Sağ Sütun: Mini Video Ekranı (Geçici Alan) -->
-    <FrameLayout
-        android:id="@+id/playerContainer"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2.5"
-        android:background="#000000" />
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvTitle: TextView = view.findViewById(R.id.tvRowTitle)
+    }
 
-</LinearLayout>
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_live_row, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val title = items[position]
+        holder.tvTitle.text = title
+
+        holder.itemView.setOnClickListener {
+            onItemClick(title)
+        }
+    }
+
+    override fun getItemCount(): Int = items.size
+}
