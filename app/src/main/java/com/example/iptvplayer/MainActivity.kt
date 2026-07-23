@@ -11,9 +11,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Home ekranındaki Live/Canlı TV butonu (Varsayılan layout buton ID'sine göre düzenlendi)
-        val btnLive = findViewById<Button>(R.id.btnLive)
-        btnLive?.setOnClickListener {
+        // Orijinal tasarımdaki "📺 Canlı TV" butonu (ID: btnLiveTv)
+        val btnLiveTv = findViewById<Button>(R.id.btnLiveTv)
+        btnLiveTv?.setOnClickListener {
             val intent = Intent(this, LiveActivity::class.java)
             startActivity(intent)
         }
