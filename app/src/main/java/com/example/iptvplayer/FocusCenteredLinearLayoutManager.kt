@@ -23,7 +23,6 @@ class FocusCenteredLinearLayoutManager(
         val childCenter = child.top + (child.height / 2)
         val targetCenter = parentHeight / 2
 
-        // Ekran ortası ile seçili öge merkezi arasındaki fark
         val scrollAmount = childCenter - targetCenter
 
         if (scrollAmount != 0) {
