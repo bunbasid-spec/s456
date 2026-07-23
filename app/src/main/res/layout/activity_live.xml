@@ -25,7 +25,7 @@
         android:clipToPadding="false"
         android:focusable="true" />
 
-    <!-- Sağ Sütun: Mini Video Ekranı (Geçici Alan) -->
+    <!-- Sağ Sütun: Mini Video Penceresi -->
     <FrameLayout
         android:id="@+id/playerContainer"
         android:layout_width="0dp"
