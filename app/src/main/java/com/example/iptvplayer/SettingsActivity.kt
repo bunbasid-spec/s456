@@ -27,7 +27,7 @@ class SettingsActivity : AppCompatActivity() {
         val rvSettings = findViewById<RecyclerView>(R.id.rvSettings)
 
         // 3 Sütunlu Grid Düzeni (12 Kart / 3 = 4 Satır Düzeni)
-        rvSettings.layoutManager = GridLayoutManager(this, 3)
+        rvSettings.layoutManager = GridLayoutManager(this, 4)
 
         // 12 Adet Ayar Kartı
         val settingsList = listOf(

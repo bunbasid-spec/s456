@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Kumanda ile Üzerine Gelindiğinde (Focused): Mor Arka Plan + BEYAZ ÇERÇEVE -->
+    <!-- Kumanda ile Üzerine Gelindiğinde (Focused): #7D4BBE Arka Plan + 5dp BEYAZ ÇERÇEVE -->
     <item android:state_focused="true">
         <shape android:shape="rectangle">
-            <solid android:color="#430C72" />
-            <stroke android:width="3dp" android:color="#FFFFFF" />
-            <corners android:radius="10dp" />
+            <solid android:color="#7D4BBE" />
+            <stroke android:width="5dp" android:color="#FFFFFF" />
+            <corners android:radius="5dp" />
         </shape>
     </item>
-    <!-- Normal Durum -->
+    <!-- Normal Durum: Düz #7D4BBE Arka Plan (Kenarlıksız) -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#430C72" />
-            <stroke android:width="1dp" android:color="#5C1399" />
-            <corners android:radius="10dp" />
+            <solid android:color="#7D4BBE" />
+            <corners android:radius="5dp" />
         </shape>
     </item>
 </selector>
