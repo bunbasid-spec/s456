@@ -1,5 +1,7 @@
 package com.example.iptvplayer
 
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,8 @@ class LiveRowAdapter(
     private val onItemClick: (String) -> Unit,
     private val onItemLongClick: ((String) -> Unit)? = null
 ) : RecyclerView.Adapter<LiveRowAdapter.ViewHolder>() {
+
+    private val handler = Handler(Looper.getMainLooper())
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvRowTitle)
@@ -41,35 +45,46 @@ class LiveRowAdapter(
 
         holder.tvTitle.text = displayText
 
-        // Normal Fare / Dokunmatik Tıklama
+        // Fare / Dokunmatik Tıklama
         holder.itemView.setOnClickListener {
             onItemClick(title)
         }
 
-        // Normal Fare / Dokunmatik Basılı Tutma
+        // Fare / Dokunmatik Basılı Tutma
         holder.itemView.setOnLongClickListener {
             onItemLongClick?.invoke(title)
             true
         }
 
-        // TV Kumandası Özel Tuş Yönetimi (OK Tuşu Basılma Süresi Kontrolü)
-        var keyDownTime = 0L
+        // TV Kumandası Zamanlayıcı Tabanlı Özel Tuş Yönetimi
+        var longPressRunnable: Runnable? = null
+        var isLongPressHandled = false
 
         holder.itemView.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
+
+                // TUŞA BASILDIĞINDA (ACTION_DOWN)
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     if (event.repeatCount == 0) {
-                        keyDownTime = System.currentTimeMillis()
-                    } else if (System.currentTimeMillis() - keyDownTime >= 500) {
-                        // 0.5 saniyeden uzun basıldıysa Favori Ekranı açılır
-                        onItemLongClick?.invoke(title)
-                        keyDownTime = Long.MAX_VALUE // Tekrar tetiklenmeyi engelle
-                        return@setOnKeyListener true
+                        isLongPressHandled = false
+
+                        // 600 ms bekleyecek zamanlayıcıyı kuruyoruz
+                        longPressRunnable = Runnable {
+                            isLongPressHandled = true
+                            onItemLongClick?.invoke(title)
+                        }
+                        handler.postDelayed(longPressRunnable!!, 600)
                     }
-                } else if (event.action == KeyEvent.ACTION_UP) {
-                    val pressDuration = System.currentTimeMillis() - keyDownTime
-                    if (pressDuration < 500) {
-                        // Kısa basıldıysa normal tıklama (Kanal Oynat)
+                    return@setOnKeyListener true
+                }
+
+                // TUŞ BIRAKILDIĞINDA (ACTION_UP)
+                else if (event.action == KeyEvent.ACTION_UP) {
+                    // Zamanlayıcıyı iptal et
+                    longPressRunnable?.let { handler.removeCallbacks(it) }
+
+                    // Eğer uzun basma henüz tetiklenmediyse, kısa basış olarak kabul et ve kanalı aç
+                    if (!isLongPressHandled) {
                         onItemClick(title)
                     }
                     return@setOnKeyListener true

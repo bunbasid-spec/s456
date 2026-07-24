@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Surum Numarasi (Orn: v1.0.3)'
+        description: 'Surum Numarasi (Orn: v1.0.6)'
         required: true
-        default: 'v1.0.3'
+        default: 'v1.0.6'
 
 jobs:
   build-and-release:
@@ -34,13 +34,13 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
-      # Otomatik Versiyon Guncelleme Adimi
+      # Otomatik Versiyon Guncelleme Adimi (Guvenli versionCode)
       - name: Update Version in build.gradle.kts
         run: |
           RAW_VERSION="${{ github.event.inputs.version_name }}"
           CLEAN_VERSION=$(echo "$RAW_VERSION" | sed 's/[vV]//g')
           sed -i "s/versionName = \".*\"/versionName = \"$CLEAN_VERSION\"/g" app/build.gradle.kts
-          NEW_CODE=$(date +%s)
+          NEW_CODE=$(date +'%Y%m%d%H')
           sed -i "s/versionCode = .*/versionCode = $NEW_CODE/g" app/build.gradle.kts
 
       - name: Build Debug APK
