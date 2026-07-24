@@ -56,9 +56,10 @@ class MainActivity : AppCompatActivity() {
             updateManager.checkForUpdates(silent = false)
         }
 
-        // Ayarlar Butonu
+        // Ayarlar Butonu (SettingsActivity Sayfasına Geçiş)
         findViewById<Button>(R.id.btnSettings)?.setOnClickListener {
-            Toast.makeText(this, "Ayarlar hazırlanıyor...", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
 
         // Çıkış Butonu

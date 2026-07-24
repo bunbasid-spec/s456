@@ -8,8 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class LiveRowAdapter(
-    private val items: List<String>,
-    private val onItemClick: (String) -> Unit
+    private var items: List<String>,
+    private val favoriteManager: FavoriteManager? = null,
+    private val onItemClick: (String) -> Unit,
+    private val onItemLongClick: ((String) -> Unit)? = null
 ) : RecyclerView.Adapter<LiveRowAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,17 +26,59 @@ class LiveRowAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val title = items[position]
-        holder.tvTitle.text = title
 
+        // Favori durumuna göre yıldız rozeti gösterimi (★1, ★2, ★1+2)
+        var displayText = title
+        if (favoriteManager != null) {
+            val status = favoriteManager.getFavoriteStatus(title)
+            when (status) {
+                FavoriteManager.FavoriteType.FAV_1 -> displayText = "$title   ★1"
+                FavoriteManager.FavoriteType.FAV_2 -> displayText = "$title   ★2"
+                FavoriteManager.FavoriteType.BOTH -> displayText = "$title   ★1+2"
+                FavoriteManager.FavoriteType.NONE -> { }
+            }
+        }
+
+        holder.tvTitle.text = displayText
+
+        // Normal Fare / Dokunmatik Tıklama
         holder.itemView.setOnClickListener {
             onItemClick(title)
         }
 
-        // Kumanda sınırlamaları
+        // Normal Fare / Dokunmatik Basılı Tutma
+        holder.itemView.setOnLongClickListener {
+            onItemLongClick?.invoke(title)
+            true
+        }
+
+        // TV Kumandası Özel Tuş Yönetimi (OK Tuşu Basılma Süresi Kontrolü)
+        var keyDownTime = 0L
+
         holder.itemView.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                // Sadece en alttaki elemandayken AŞAĞI basılırsa odağı listede tut
-                if (position == items.size - 1 && keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+            if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    if (event.repeatCount == 0) {
+                        keyDownTime = System.currentTimeMillis()
+                    } else if (System.currentTimeMillis() - keyDownTime >= 500) {
+                        // 0.5 saniyeden uzun basıldıysa Favori Ekranı açılır
+                        onItemLongClick?.invoke(title)
+                        keyDownTime = Long.MAX_VALUE // Tekrar tetiklenmeyi engelle
+                        return@setOnKeyListener true
+                    }
+                } else if (event.action == KeyEvent.ACTION_UP) {
+                    val pressDuration = System.currentTimeMillis() - keyDownTime
+                    if (pressDuration < 500) {
+                        // Kısa basıldıysa normal tıklama (Kanal Oynat)
+                        onItemClick(title)
+                    }
+                    return@setOnKeyListener true
+                }
+            }
+
+            // Kumanda Sınırlamaları (Listenin en altındayken AŞAĞI basılırsa odağı koru)
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                if (position == items.size - 1) {
                     return@setOnKeyListener true
                 }
             }
@@ -43,4 +87,9 @@ class LiveRowAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun updateData(newItems: List<String>) {
+        this.items = newItems
+        notifyDataSetChanged()
+    }
 }

@@ -42,6 +42,11 @@
             android:name=".LiveActivity"
             android:exported="false" />
 
+        <!-- Settings Ekranı -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
         <!-- Güncelleme APK'sı Yüklemek İçin FileProvider -->
         <provider
             android:name="androidx.core.content.FileProvider"
