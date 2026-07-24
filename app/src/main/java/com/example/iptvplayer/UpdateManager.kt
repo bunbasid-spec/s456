@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.content.FileProvider
@@ -18,7 +17,6 @@ import kotlin.concurrent.thread
 
 class UpdateManager(private val context: Context) {
 
-    // GitHub Repo ve Kullanıcı Bilgilerin
     private val githubUser = "bunbasid-spec"
     private val repoName = "s456"
     private val apiUrl = "https://api.github.com/repos/$githubUser/$repoName/releases/latest"
@@ -115,7 +113,8 @@ class UpdateManager(private val context: Context) {
                 val connection = url.openConnection() as HttpURLConnection
                 connection.connect()
 
-                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "update.apk")
+                // Dosyayı doğrudan cache klasörüne indiriyoruz (Fire OS uyumu için)
+                val file = File(context.cacheDir, "update.apk")
                 if (file.exists()) file.delete()
 
                 val inputStream = connection.inputStream
@@ -143,7 +142,6 @@ class UpdateManager(private val context: Context) {
         }
     }
 
-    // FIRE TV UYUMLU İNSTALL YÖNTEMİ
     private fun installApk(file: File) {
         try {
             val apkUri: Uri = FileProvider.getUriForFile(
@@ -156,13 +154,20 @@ class UpdateManager(private val context: Context) {
                 setDataAndType(apkUri, "application/vnd.android.package-archive")
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
+
+            // Paket yükleyiciye açık izin veriyoruz
+            val resInfoList = context.packageManager.queryIntentActivities(intent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+            for (resolveInfo in resInfoList) {
+                val packageName = resolveInfo.activityInfo.packageName
+                context.grantUriPermission(packageName, apkUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
             context.startActivity(intent)
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(context, "Kurulum başlatılamadı: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Kurulum hatası: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         }
     }
 }
